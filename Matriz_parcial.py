@@ -1,100 +1,56 @@
-
-from tkinter import *
+import tkinter as tk
 import random
 
+root = tk.Tk()
 
-root = Tk()
-root.title("Buscador de numeros en una matriz")
-root.geometry("800x600")
-root.configure(background = "light blue")
-
-
-etiqueta =Label(root, text = "Ingrese el numero de filas y columnas de la matriz:")
-
-#se posiciona la etiqueta en la ventana
-etiqueta.pack()
-
-#se crea una caja de texto para ingresar el numero de filas y columnas
-caja_texto = Entry(root)
-
-
-#se posiciona la caja de texto en la ventana
-caja_texto.pack()
-
-
-#se define una funcion para generar la matriz
-def generar_matriz():
-    
-    #se obtiene el numero de filas y columnas de la matriz
-    filas_columnas = int(caja_texto.get())
-    
-    #se genera la matriz con numeros aleatorios en un rango determinado
-    matriz = [[random.randint(0,9) for i in range(filas_columnas)] for j in range(filas_columnas)]
-    
-    return matriz
-
-
-#se define una funcion para buscar un numero en la matriz
-def buscar_numero(matriz, numero):
-    
-    #se recorre la matriz
+#funcion para buscar el numero en la matriz
+def buscar():
+    buscar_num = int(buscar_entry.get())
     for i in range(len(matriz)):
-        for j in range(len(matriz[i])):
-            
-            #si el numero se encuentra en la matriz, se retorna la posicion en la que se encuentra
-            if(matriz[i][j] == numero):
-                return i, j
-    
-    #si el numero no se encuentra en la matriz, se retorna None
-    return None
-        
+        for j in range(len(matriz[0])):
+            if matriz[i][j] == buscar_num:
+                #pintar el rectangulo correspondiente al numero en verde
+                canvas.itemconfig(rectangulos[i][j], fill="green")
 
-#se define una funcion para dibujar la matriz
-def dibujar_matriz(matriz):
-    
-    #se obtiene el canvas en el que se va a dibujar la matriz
-    canvas = Canvas(root, width = 600, height = 600)
-    
-    #se obtiene el ancho y el alto de cada elemento de la matriz
-    ancho = 600/len(matriz)
-    alto = 600/len(matriz)
-    
-    #se recorre la matriz
-    for i in range(len(matriz)):
-        for j in range(len(matriz[i])):
-            
-            #para cada elemento de la matriz, se dibuja un rectangulo en el canvas, de un color determinado
-            canvas.create_rectangle(j*ancho, i*alto, (j+1)*ancho, (i+1)*alto, fill = "red")
-            
-            #dentro de cada rectangulo, se muestra el elemento de la matriz correspondiente
-            canvas.create_text(j*ancho + ancho/2, i*alto + alto/2, text = str(matriz[i][j]), font = ("Arial", 16))
-    
-    #se posiciona el canvas en la ventana
-    canvas.pack()
-    
-    
-    #se obtiene el numero a buscar en la matriz
-    numero = int(input("Ingrese el numero a buscar en la matriz: "))
-    
-    #se llama a la funcion para buscar el numero en la matriz
-    posicion = buscar_numero(matriz, numero)
-    
-    #si el numero se encuentra en la matriz, se dibuja un rectangulo en el canvas, de un color verde, que indica la posicion del numero en la matriz
-    if(posicion != None):
-        canvas.create_rectangle(posicion[1]*ancho, posicion[0]*alto, (posicion[1]+1)*ancho, (posicion[0]+1)*alto, fill = "green")
-    
-    #se muestra un mensaje en la consola, indicando si el numero se encuentra o no en la matriz
-    if(posicion == None):
-        print("El numero no se encuentra en la matriz")
-    else:
-        print("El numero se encuentra en la posicion: ", posicion[0], posicion[1])
+#funcion para crear la matriz
+def crear_matriz():
+    global matriz, rectangulos #matriz global y la lista de rectangulos
+    matriz = []
+    rectangulos = []
+    #obtener el numero de filas y columnas de la matriz
+    filas = int(filas_entry.get())
+    columnas = int(columnas_entry.get())
+    for i in range(filas):
+        fila = []
+        for j in range(columnas):
+            #generar un numero aleatorio para cada elemento de la matriz
+            num = random.randint(0, 9)
+            fila.append(num)
+            #dibujar los rectangulos en el canvas, almacenando los id's en la lista rectangulos
+            rectangulo = canvas.create_rectangle(i*50, j*50, i*50+50, j*50+50, fill="white")
+            rectangulos.append(rectangulo)
+            #agregar el numero dentro del rectangulo
+            canvas.create_text(i*50+25, j*50+25, text=str(num))
+        matriz.append(fila)
 
+#crear los botones y el canvas
+canvas = tk.Canvas(root, width=500, height=500)
+canvas.pack()
 
-#se crea un boton para llamar a la funcion que genera la matriz
-boton = Button(root, text = "Generar matriz", command = generar_matriz)
+tk.Label(root, text="Ingrese el numero de filas de la matriz: ").pack()
+filas_entry = tk.Entry(root)
+filas_entry.pack()
 
-#se posiciona el boton en la ventana
-boton.pack()
+tk.Label(root, text="Ingrese el numero de columnas de la matriz: ").pack()
+columnas_entry = tk.Entry(root)
+columnas_entry.pack()
 
+tk.Button(root, text="Crear Matriz", command=crear_matriz).pack()
+
+tk.Label(root, text="Buscar numero en la matriz: ").pack()
+buscar_entry = tk.Entry(root)
+buscar_entry.pack()
+
+tk.Button(root, text="Buscar", command=buscar).pack()
 
 root.mainloop()
